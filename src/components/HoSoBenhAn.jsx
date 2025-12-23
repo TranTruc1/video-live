@@ -268,7 +268,7 @@ const HoSoBenhAn = () => {
                       
                       <Row style={{ marginBottom: '10px' }}>
                         <Col span={24} style={{ display: 'flex', alignItems: 'center' }}>
-                          <span style={labelStyle}>Họ Tên Người Bệnh:</span>
+                          <span style={labelStyle}>Họ tên người bệnh:</span>
                           <EditableField
                             value={data.name}
                             onChange={(val) => handleChange('name', val)}
@@ -290,7 +290,7 @@ const HoSoBenhAn = () => {
                           />
                         </Col>
                         <Col span={16} style={{ display: 'flex', alignItems: 'center' }}>
-                          <span style={labelStyle}>Số Phone:</span>
+                          <span style={labelStyle}>Phone:</span>
                           <EditableField 
                             value={data.phone} 
                             onChange={(val) => handleChange('phone', val)} 
@@ -316,7 +316,7 @@ const HoSoBenhAn = () => {
 
                       <Row style={{ marginBottom: '10px' }}>
                         <Col span={24} style={{ display: 'flex', alignItems: 'center' }}>
-                          <span style={labelStyle}>Ngày Đặt Hàng:</span>
+                          <span style={labelStyle}>Ngày đặt hàng:</span>
                           <EditableField value={data.orderDate} onChange={(val) => handleChange('orderDate', val)} />
                         </Col>
                       </Row>
@@ -328,10 +328,10 @@ const HoSoBenhAn = () => {
                       <div style={{ ...labelStyle, textDecoration: 'underline', marginBottom: '10px' }}>Ghi chú:</div>
                       <ul style={{ paddingLeft: '25px', margin: 0, ...textStyle }}>
                         <li style={{ marginBottom: '8px' }}>
-                          LUTA LIFE được sản xuất trực tiếp tại USA. Nếu phát hiện hàng giả, hàng nhái, hàng kém chất lượng bồi thường 1.000 USD.
+                          - LUTA LIFE được sản xuất trực tiếp tại USA. Nếu phát hiện hàng giả, hàng nhái, hàng kém chất lượng bồi thường 1.000 USD.
                         </li>
                         <li>
-                          LUTA LIFE được FDA và GMP chứng nhận an toàn lành tính vì được chiết xuất từ thiên nhiên như hoa hòe, hoa dâm bụt, củ tỏi...
+                          - LUTA LIFE được FDA và GMP chứng nhận an toàn lành tính vì được chiết xuất từ thiên nhiên như hoa hòe, hoa dâm bụt, củ tỏi...
                         </li>
                       </ul>
                     </div>
@@ -340,13 +340,13 @@ const HoSoBenhAn = () => {
                       <div style={{ ...labelStyle, textDecoration: 'underline', marginBottom: '10px' }}>Yêu Cầu Bệnh Nhân:</div>
                       <ul style={{ paddingLeft: '25px', margin: 0, ...textStyle }}>
                         <li style={{ marginBottom: '8px' }}>
-                          Dùng đúng - đủ - đều theo liệu trình và phác đồ điều trị mà chuyên gia đưa ra.
+                          - Dùng đúng - đủ - đều theo liệu trình và phác đồ điều trị mà chuyên gia đưa ra.
                         </li>
                         <li style={{ marginBottom: '8px' }}>
-                          Đo và theo dõi chỉ số huyết áp thường xuyên.
+                          - Đo và theo dõi chỉ số huyết áp thường xuyên.
                         </li>
                         <li>
-                          10 ngày chuyên gia sẽ liên hệ theo dõi và xem hiệu quả của thuốc với bệnh nhân.
+                          - 10 ngày chuyên gia sẽ liên hệ theo dõi và xem hiệu quả của thuốc với bệnh nhân.
                         </li>
                       </ul>
                     </div>
