@@ -235,7 +235,7 @@ const HoSoBenhAn = () => {
              {/* DÒNG TÌNH TRẠNG */}
             <Row style={{ marginBottom: '10px' }}>
               <Col span={24} style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={labelStyle}>Tình trạng:</span>
+                <span style={labelStyle}>Tình trạng bệnh:</span>
                 <EditableField value={data.status} onChange={(val) => handleChange('status', val)} placeholder="Nhập tình trạng bệnh..." style={{ flex: 1 }} />
               </Col>
             </Row>
