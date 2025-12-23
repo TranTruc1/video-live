@@ -5,7 +5,7 @@ import html2canvas from 'html2canvas';
 
 const { TextArea } = Input;
 
-// Component ô nhập liệu (Font Arial, Size 14pt, Mặc định chữ thường)
+// Component ô nhập liệu
 const EditableField = ({ value, onChange, placeholder, multiline = false, style, bold = false }) => {
   const [editing, setEditing] = useState(false);
   const [tempValue, setTempValue] = useState(value);
@@ -56,30 +56,40 @@ const EditableField = ({ value, onChange, placeholder, multiline = false, style,
       style={{
         cursor: 'pointer',
         borderBottom: '1px dotted #ccc',
-        minHeight: '28px',
+        minHeight: '28px', // Giữ chiều cao tối thiểu để dòng kẻ vẫn hiện dù không có chữ
         display: 'inline-block',
         minWidth: '50px',
         ...commonStyle,
       }}
       title="Nhấn để chỉnh sửa"
     >
-      {value || <span style={{ color: '#ccc', fontStyle: 'italic', fontWeight: 'normal' }}>{placeholder}</span>}
+      {value ? (
+        value
+      ) : (
+        // Thêm thuộc tính data-html2canvas-ignore để ẩn khi xuất ảnh
+        <span 
+          data-html2canvas-ignore="true" 
+          style={{ color: '#ccc', fontStyle: 'italic', fontWeight: 'normal' }}
+        >
+          {placeholder}
+        </span>
+      )}
     </div>
   );
 };
 
 const HoSoBenhAn = () => {
-  // CẬP NHẬT THÔNG TIN MẶC ĐỊNH TẠI ĐÂY
   const [data, setData] = useState({
     name: '',
     age: '',
     phone: '',
-    address: '', // Địa chỉ người bệnh (để trống để nhập)
+    address: '',
+    status: '', 
     orderDate: new Date().toLocaleDateString('vi-VN'),
     
-    // Thông tin liên hệ (Footer) - Đã điền sẵn theo yêu cầu
+    // Thông tin liên hệ footer
     contactPhone: '+1 832-650-2216',
-    contactMail: 'support@lutalifeusa.online', // Mình tạm điền mail theo domain web, bạn có thể sửa
+    contactMail: 'support@lutalifeusa.online',
     contactWeb: 'https://lutalifeusa.online',
     contactAddress: 'Pagemill Rd , Dallas, TX, United States, Texas'
   });
@@ -149,7 +159,7 @@ const HoSoBenhAn = () => {
           boxSizing: 'border-box'
         }}
       >
-        {/* LOGO CHÌM TỪ FILE PUBLIC/LOGO.PNG */}
+        {/* LOGO CHÌM */}
         <div
           style={{
             position: 'absolute',
@@ -218,7 +228,15 @@ const HoSoBenhAn = () => {
             <Row style={{ marginBottom: '10px' }}>
               <Col span={24} style={{ display: 'flex', alignItems: 'baseline' }}>
                 <span style={labelStyle}>Địa chỉ:</span>
-                <EditableField value={data.address} onChange={(val) => handleChange('address', val)} placeholder="Nhập địa chỉ người bệnh..." style={{ flex: 1 }} multiline={true} />
+                <EditableField value={data.address} onChange={(val) => handleChange('address', val)} placeholder="Nhập địa chỉ..." style={{ flex: 1 }} multiline={true} />
+              </Col>
+            </Row>
+
+             {/* DÒNG TÌNH TRẠNG */}
+            <Row style={{ marginBottom: '10px' }}>
+              <Col span={24} style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={labelStyle}>Tình trạng:</span>
+                <EditableField value={data.status} onChange={(val) => handleChange('status', val)} placeholder="Nhập tình trạng bệnh..." style={{ flex: 1 }} />
               </Col>
             </Row>
 
@@ -263,7 +281,7 @@ const HoSoBenhAn = () => {
 
           <Divider style={{ borderTop: '1px solid #ccc', margin: '20px 0' }} />
 
-          {/* LIÊN HỆ (Đã cập nhật thông tin) */}
+          {/* LIÊN HỆ */}
           <div style={{ marginTop: '30px' }}>
             <div style={{ ...textStyle, fontStyle: 'italic', marginBottom: '15px' }}>Mọi thắc mắc xin liên hệ:</div>
             <div style={{ marginLeft: '10px' }}>
@@ -288,11 +306,7 @@ const HoSoBenhAn = () => {
                <Row>
                  <Col span={4}><span style={labelStyle}>Địa chỉ:</span></Col>
                  <Col span={20}>
-                    <EditableField 
-                      value={data.contactAddress} 
-                      onChange={(val) => handleChange('contactAddress', val)} 
-                      multiline={true} // Cho phép xuống dòng nếu địa chỉ dài
-                    />
+                    <EditableField value={data.contactAddress} onChange={(val) => handleChange('contactAddress', val)} multiline={true} />
                  </Col>
                </Row>
             </div>
@@ -301,7 +315,6 @@ const HoSoBenhAn = () => {
         </div>
       </div>
 
-      {/* Modal xem trước */}
       <Modal
         title="Xem trước ảnh"
         open={isModalVisible}
