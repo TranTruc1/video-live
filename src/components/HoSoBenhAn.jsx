@@ -5,7 +5,7 @@ import html2canvas from 'html2canvas';
 
 const { TextArea } = Input;
 
-// Component ô nhập liệu (Giữ nguyên)
+// --- COMPONENT Ô NHẬP LIỆU ---
 const EditableField = ({ value, onChange, placeholder, multiline = false, style, bold = false }) => {
   const [editing, setEditing] = useState(false);
   const [tempValue, setTempValue] = useState(value);
@@ -20,6 +20,7 @@ const EditableField = ({ value, onChange, placeholder, multiline = false, style,
     onChange(tempValue);
   };
 
+  // Style chung cho chữ: Arial, 14pt
   const commonStyle = {
     fontSize: '14pt',
     fontFamily: 'Arial, sans-serif',
@@ -66,6 +67,7 @@ const EditableField = ({ value, onChange, placeholder, multiline = false, style,
       {value ? (
         value
       ) : (
+        // data-html2canvas-ignore giúp ẩn chữ gợi ý khi xuất ảnh
         <span
           data-html2canvas-ignore="true"
           style={{ color: '#ccc', fontStyle: 'italic', fontWeight: 'normal' }}
@@ -77,6 +79,7 @@ const EditableField = ({ value, onChange, placeholder, multiline = false, style,
   );
 };
 
+// --- COMPONENT CHÍNH ---
 const HoSoBenhAn = () => {
   const [data, setData] = useState({
     name: '',
@@ -103,8 +106,8 @@ const HoSoBenhAn = () => {
     if (printRef.current) {
       try {
         const canvas = await html2canvas(printRef.current, {
-          scale: 3,
-          useCORS: true,
+          scale: 3, // Tăng độ nét
+          useCORS: true, // Cho phép tải ảnh từ nguồn ngoài/local
           backgroundColor: '#ffffff',
         });
 
@@ -133,6 +136,7 @@ const HoSoBenhAn = () => {
   return (
     <div style={{ background: '#333', padding: '30px', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
+      {/* THANH CÔNG CỤ */}
       <div style={{ marginBottom: '20px' }}>
         <Button type="primary" icon={<EyeOutlined />} size="large" onClick={handleExport} style={{ height: '50px', fontSize: '16px' }}>
           XEM TRƯỚC VÀ LƯU ẢNH
@@ -152,7 +156,7 @@ const HoSoBenhAn = () => {
         }}
       >
         
-        {/* --- LAYER 0: KHUNG ẢNH NỀN --- */}
+        {/* --- LAYER 0: ẢNH KHUNG VIỀN NỀN (public/khung.png) --- */}
         <img 
           src="/khung.png" 
           alt="Khung nền"
@@ -166,7 +170,7 @@ const HoSoBenhAn = () => {
           }}
         />
 
-        {/* --- LAYER 1: LOGO CHÌM --- */}
+        {/* --- LAYER 1: LOGO CHÌM GIỮA MÀN HÌNH (public/logo.png) --- */}
         <div
           style={{
             position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
@@ -187,16 +191,23 @@ const HoSoBenhAn = () => {
             position: 'relative', 
             zIndex: 2,
             height: '100%',
+            // Flexbox giúp đẩy phần Chân trang xuống đáy
             display: 'flex',
             flexDirection: 'column',
+            
+            // Căn chỉnh khoảng cách chữ so với viền khung
+            // Top: 120px (để tiêu đề thấp xuống)
+            // Bottom: 100px (để chân trang cách đáy)
+            // Left/Right: 90px (lùi vào trong cho thoáng)
             padding: '120px 90px 100px 90px', 
+            
             fontFamily: 'Arial, sans-serif',
             fontSize: '14pt',
             lineHeight: '1.5',
             color: '#000',
         }}>
             
-            {/* PHẦN THÂN */}
+            {/* PHẦN THÂN TRÊN */}
             <div>
                 <div style={{ textAlign: 'center', marginBottom: '40px' }}>
                   <h1 style={{
@@ -210,7 +221,7 @@ const HoSoBenhAn = () => {
 
                 <div style={{ marginBottom: '20px' }}>
                   
-                  {/* DÒNG 1: HỌ TÊN (FULL DÒNG) */}
+                  {/* HỌ TÊN (FULL DÒNG) */}
                   <Row style={{ marginBottom: '10px' }}>
                     <Col span={24} style={{ display: 'flex', alignItems: 'center' }}>
                       <span style={labelStyle}>Họ Tên Người Bệnh:</span>
@@ -224,9 +235,8 @@ const HoSoBenhAn = () => {
                     </Col>
                   </Row>
 
-                  {/* DÒNG 2: TUỔI VÀ SỐ PHONE CÙNG DÒNG */}
+                  {/* TUỔI VÀ SỐ PHONE (CHUNG DÒNG) */}
                   <Row gutter={24} style={{ marginBottom: '10px' }}>
-                    {/* Cột Tuổi */}
                     <Col span={8} style={{ display: 'flex', alignItems: 'center' }}>
                       <span style={labelStyle}>Tuổi:</span>
                       <EditableField 
@@ -236,7 +246,6 @@ const HoSoBenhAn = () => {
                         style={{ width: '60px', textAlign: 'center' }} 
                       />
                     </Col>
-                    {/* Cột Số Phone */}
                     <Col span={16} style={{ display: 'flex', alignItems: 'center' }}>
                       <span style={labelStyle}>Số Phone:</span>
                       <EditableField 
@@ -248,7 +257,6 @@ const HoSoBenhAn = () => {
                     </Col>
                   </Row>
 
-                  {/* CÁC DÒNG CÒN LẠI */}
                   <Row style={{ marginBottom: '10px' }}>
                     <Col span={24} style={{ display: 'flex', alignItems: 'baseline' }}>
                       <span style={labelStyle}>Địa chỉ:</span>
@@ -301,7 +309,7 @@ const HoSoBenhAn = () => {
                 </div>
             </div>
 
-            {/* PHẦN CHÂN TRANG */}
+            {/* PHẦN CHÂN TRANG (TỰ ĐỘNG ĐẨY XUỐNG ĐÁY) */}
             <div style={{ marginTop: 'auto', borderTop: '1px solid #ccc', paddingTop: '20px' }}>
               <div style={{ ...textStyle, fontStyle: 'italic', marginBottom: '15px' }}>Mọi thắc mắc xin liên hệ:</div>
               <div style={{ marginLeft: '10px' }}>
@@ -335,18 +343,48 @@ const HoSoBenhAn = () => {
         </div>
       </div>
 
+      {/* MODAL XEM TRƯỚC VÀ LƯU ẢNH */}
       <Modal
         title="Xem trước ảnh"
         open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         footer={[
           <Button key="back" onClick={() => setIsModalVisible(false)}>Sửa lại</Button>,
-          <Button key="submit" type="primary" icon={<DownloadOutlined />} onClick={handleSave} size="large">LƯU ẢNH NGAY</Button>,
+          <Button key="submit" type="primary" icon={<DownloadOutlined />} onClick={handleSave} size="large">
+            Tải về (PC/Android)
+          </Button>,
         ]}
         width={700}
         centered
       >
-        {previewImage && <img src={previewImage} alt="Preview" style={{ width: '100%', border: '1px solid #ddd' }} />}
+        <div style={{ textAlign: 'center' }}>
+            {/* HƯỚNG DẪN DÀNH RIÊNG CHO IPHONE */}
+            <div style={{ 
+                marginBottom: '15px', 
+                padding: '10px', 
+                background: '#fffbe6', 
+                border: '1px solid #ffe58f',
+                borderRadius: '4px',
+                color: '#d48806',
+                fontWeight: 'bold',
+                fontSize: '14px'
+            }}>
+                ⚠️ Trên iPhone/iPad (Safari): <br/>
+                Hãy <u>CHẠM VÀ GIỮ</u> vào ảnh bên dưới, sau đó chọn <u>"Lưu vào Ảnh"</u> (Save to Photos).
+            </div>
+
+            {previewImage && (
+                <img 
+                    src={previewImage} 
+                    alt="Preview" 
+                    style={{ 
+                        width: '100%', 
+                        border: '1px solid #ddd',
+                        boxShadow: '0 4px 10px rgba(0,0,0,0.1)' 
+                    }} 
+                />
+            )}
+        </div>
       </Modal>
     </div>
   );
