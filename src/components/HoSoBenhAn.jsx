@@ -88,7 +88,7 @@ const HoSoBenhAn = () => {
     status: '',
     orderDate: new Date().toLocaleDateString('vi-VN'),
     contactPhone: '+1 832-650-2216',
-    contactMail: 'support@lutalifeusa.online',
+    contactMail: 'lutalifeusa@gmail.com',
     contactWeb: 'https://lutalifeusa.online',
     contactAddress: 'Pagemill Rd , Dallas, TX, United States, Texas'
   });
