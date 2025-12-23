@@ -5,7 +5,7 @@ import html2canvas from 'html2canvas';
 
 const { TextArea } = Input;
 
-// Component ô nhập liệu (Giữ nguyên không đổi)
+// Component ô nhập liệu (Giữ nguyên)
 const EditableField = ({ value, onChange, placeholder, multiline = false, style, bold = false }) => {
   const [editing, setEditing] = useState(false);
   const [tempValue, setTempValue] = useState(value);
@@ -105,7 +105,7 @@ const HoSoBenhAn = () => {
         const canvas = await html2canvas(printRef.current, {
           scale: 3,
           useCORS: true,
-          backgroundColor: '#ffffff', // Màu nền dự phòng
+          backgroundColor: '#ffffff',
         });
 
         const imgData = canvas.toDataURL('image/png');
@@ -145,47 +145,33 @@ const HoSoBenhAn = () => {
         style={{
           width: '794px',
           minHeight: '1123px',
-          position: 'relative', // Quan trọng để các layer con tuyệt đối bám theo
-          background: '#fff', // Màu nền mặc định
+          position: 'relative',
+          background: '#fff',
           boxSizing: 'border-box',
-          overflow: 'hidden' // Đảm bảo không có gì lòi ra khỏi tờ giấy
+          overflow: 'hidden'
         }}
       >
         
-        {/* --- LAYER 0: KHUNG ẢNH NỀN (DƯỚI CÙNG) --- */}
+        {/* --- LAYER 0: KHUNG ẢNH NỀN --- */}
         <img 
           src="/khung.png" 
           alt="Khung nền"
           style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'stretch', // Kéo giãn để vừa khít 100% tờ giấy
-            zIndex: 0, // Nằm dưới cùng
+            position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+            objectFit: 'stretch', zIndex: 0,
           }}
           onError={(e) => {
-             e.target.style.display = 'none'; // Ẩn nếu lỗi ảnh
+             e.target.style.display = 'none';
              message.warning('Chưa tìm thấy file public/khung.png');
           }}
         />
 
-        {/* --- LAYER 1: LOGO CHÌM (Ở GIỮA) --- */}
+        {/* --- LAYER 1: LOGO CHÌM --- */}
         <div
           style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '30%',
-            opacity: 0.15,
-            pointerEvents: 'none',
-            zIndex: 1, // Nằm trên khung, dưới chữ
-            textAlign: 'center',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
+            position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+            width: '30%', opacity: 0.15, pointerEvents: 'none', zIndex: 1,
+            textAlign: 'center', display: 'flex', justifyContent: 'center', alignItems: 'center'
           }}
         >
           <img
@@ -196,111 +182,127 @@ const HoSoBenhAn = () => {
           />
         </div>
 
-        {/* --- LAYER 2: NỘI DUNG VĂN BẢN (TRÊN CÙNG) --- */}
+        {/* --- LAYER 2: NỘI DUNG VĂN BẢN --- */}
         <div style={{ 
             position: 'relative', 
-            zIndex: 2, // Nằm trên cùng để click sửa được
-            // --- THAY ĐỔI Ở ĐÂY ---
-            // Tăng padding TOP lên 100px để đẩy tiêu đề xuống
-            // Cấu trúc padding: Top Right Bottom Left
-            padding: '80px 90px 60px 90px', 
-            // ---------------------
+            zIndex: 2,
             height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '120px 90px 100px 90px', 
             fontFamily: 'Arial, sans-serif',
             fontSize: '14pt',
             lineHeight: '1.5',
             color: '#000',
         }}>
             
-            <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-              <h1 style={{
-                fontSize: '24pt', fontWeight: 'bold', textTransform: 'uppercase',
-                margin: 0, paddingBottom: '10px', display: 'inline-block',
-                fontFamily: 'Arial, sans-serif', borderBottom: '2px solid #000'
-              }}>
-                HỒ SƠ BỆNH ÁN
-              </h1>
+            {/* PHẦN THÂN */}
+            <div>
+                <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+                  <h1 style={{
+                    fontSize: '24pt', fontWeight: 'bold', textTransform: 'uppercase',
+                    margin: 0, paddingBottom: '10px', display: 'inline-block',
+                    fontFamily: 'Arial, sans-serif', borderBottom: '2px solid #000'
+                  }}>
+                    HỒ SƠ BỆNH ÁN
+                  </h1>
+                </div>
+
+                <div style={{ marginBottom: '20px' }}>
+                  
+                  {/* DÒNG 1: HỌ TÊN (FULL DÒNG) */}
+                  <Row style={{ marginBottom: '10px' }}>
+                    <Col span={24} style={{ display: 'flex', alignItems: 'center' }}>
+                      <span style={labelStyle}>Họ Tên Người Bệnh:</span>
+                      <EditableField
+                        value={data.name}
+                        onChange={(val) => handleChange('name', val)}
+                        placeholder="Nguyễn Văn A"
+                        style={{ ...textStyle, flex: 1, textTransform: 'uppercase' }}
+                        bold={true}
+                      />
+                    </Col>
+                  </Row>
+
+                  {/* DÒNG 2: TUỔI VÀ SỐ PHONE CÙNG DÒNG */}
+                  <Row gutter={24} style={{ marginBottom: '10px' }}>
+                    {/* Cột Tuổi */}
+                    <Col span={8} style={{ display: 'flex', alignItems: 'center' }}>
+                      <span style={labelStyle}>Tuổi:</span>
+                      <EditableField 
+                        value={data.age} 
+                        onChange={(val) => handleChange('age', val)} 
+                        placeholder="50" 
+                        style={{ width: '60px', textAlign: 'center' }} 
+                      />
+                    </Col>
+                    {/* Cột Số Phone */}
+                    <Col span={16} style={{ display: 'flex', alignItems: 'center' }}>
+                      <span style={labelStyle}>Số Phone:</span>
+                      <EditableField 
+                        value={data.phone} 
+                        onChange={(val) => handleChange('phone', val)} 
+                        placeholder="09xx..." 
+                        style={{ flex: 1 }} 
+                      />
+                    </Col>
+                  </Row>
+
+                  {/* CÁC DÒNG CÒN LẠI */}
+                  <Row style={{ marginBottom: '10px' }}>
+                    <Col span={24} style={{ display: 'flex', alignItems: 'baseline' }}>
+                      <span style={labelStyle}>Địa chỉ:</span>
+                      <EditableField value={data.address} onChange={(val) => handleChange('address', val)} placeholder="Nhập địa chỉ..." style={{ flex: 1 }} multiline={true} />
+                    </Col>
+                  </Row>
+
+                  <Row style={{ marginBottom: '10px' }}>
+                    <Col span={24} style={{ display: 'flex', alignItems: 'center' }}>
+                      <span style={labelStyle}>Tình trạng:</span>
+                      <EditableField value={data.status} onChange={(val) => handleChange('status', val)} placeholder="Nhập tình trạng bệnh..." style={{ flex: 1 }} />
+                    </Col>
+                  </Row>
+
+                  <Row style={{ marginBottom: '10px' }}>
+                    <Col span={24} style={{ display: 'flex', alignItems: 'center' }}>
+                      <span style={labelStyle}>Ngày Đặt Hàng:</span>
+                      <EditableField value={data.orderDate} onChange={(val) => handleChange('orderDate', val)} />
+                    </Col>
+                  </Row>
+                </div>
+
+                <Divider style={{ borderTop: '1px solid #ccc', margin: '20px 0' }} />
+
+                <div style={{ marginBottom: '25px' }}>
+                  <div style={{ ...labelStyle, textDecoration: 'underline', marginBottom: '10px' }}>Ghi chú:</div>
+                  <ul style={{ paddingLeft: '25px', margin: 0, ...textStyle }}>
+                    <li style={{ marginBottom: '8px' }}>
+                      LUTA LIFE được sản xuất trực tiếp tại USA. Nếu phát hiện hàng giả, hàng nhái, hàng kém chất lượng bồi thường 1.000 USD.
+                    </li>
+                    <li>
+                      LUTA LIFE được FDA và GMP chứng nhận an toàn lành tính vì được chiết xuất từ thiên nhiên như hoa hòe, hoa dâm bụt, củ tỏi...
+                    </li>
+                  </ul>
+                </div>
+
+                <div style={{ marginBottom: '30px' }}>
+                  <div style={{ ...labelStyle, textDecoration: 'underline', marginBottom: '10px' }}>Yêu Cầu Bệnh Nhân:</div>
+                  <ul style={{ paddingLeft: '25px', margin: 0, ...textStyle }}>
+                    <li style={{ marginBottom: '8px' }}>
+                      Dùng đúng - đủ - đều theo liệu trình và phác đồ điều trị mà chuyên gia đưa ra.
+                    </li>
+                    <li style={{ marginBottom: '8px' }}>
+                      Đo và theo dõi chỉ số huyết áp thường xuyên.
+                    </li>
+                    <li>
+                      10 ngày chuyên gia sẽ liên hệ theo dõi và xem hiệu quả của thuốc với bệnh nhân.
+                    </li>
+                  </ul>
+                </div>
             </div>
 
-            <div style={{ marginBottom: '20px' }}>
-              <Row gutter={16} align="middle" style={{ marginBottom: '10px' }}>
-                <Col span={16} style={{ display: 'flex', alignItems: 'center' }}>
-                  <span style={labelStyle}>Họ Tên Người Bệnh:</span>
-                  <EditableField
-                    value={data.name}
-                    onChange={(val) => handleChange('name', val)}
-                    placeholder="Nguyễn Văn A"
-                    style={{ ...textStyle, flex: 1, textTransform: 'uppercase' }}
-                    bold={true}
-                  />
-                </Col>
-                <Col span={8} style={{ display: 'flex', alignItems: 'center' }}>
-                  <span style={labelStyle}>Tuổi:</span>
-                  <EditableField value={data.age} onChange={(val) => handleChange('age', val)} placeholder="50" style={{ width: '60px', textAlign: 'center' }} />
-                </Col>
-              </Row>
-
-              <Row style={{ marginBottom: '10px' }}>
-                <Col span={24} style={{ display: 'flex', alignItems: 'center' }}>
-                  <span style={labelStyle}>Số Phone:</span>
-                  <EditableField value={data.phone} onChange={(val) => handleChange('phone', val)} placeholder="09xx..." style={{ flex: 1 }} />
-                </Col>
-              </Row>
-
-              <Row style={{ marginBottom: '10px' }}>
-                <Col span={24} style={{ display: 'flex', alignItems: 'baseline' }}>
-                  <span style={labelStyle}>Địa chỉ:</span>
-                  <EditableField value={data.address} onChange={(val) => handleChange('address', val)} placeholder="Nhập địa chỉ..." style={{ flex: 1 }} multiline={true} />
-                </Col>
-              </Row>
-
-              <Row style={{ marginBottom: '10px' }}>
-                <Col span={24} style={{ display: 'flex', alignItems: 'center' }}>
-                  <span style={labelStyle}>Tình trạng:</span>
-                  <EditableField value={data.status} onChange={(val) => handleChange('status', val)} placeholder="Nhập tình trạng bệnh..." style={{ flex: 1 }} />
-                </Col>
-              </Row>
-
-              <Row style={{ marginBottom: '10px' }}>
-                <Col span={24} style={{ display: 'flex', alignItems: 'center' }}>
-                  <span style={labelStyle}>Ngày Đặt Hàng:</span>
-                  <EditableField value={data.orderDate} onChange={(val) => handleChange('orderDate', val)} />
-                </Col>
-              </Row>
-            </div>
-
-            <Divider style={{ borderTop: '1px solid #ccc', margin: '20px 0' }} />
-
-            <div style={{ marginBottom: '25px' }}>
-              <div style={{ ...labelStyle, textDecoration: 'underline', marginBottom: '10px' }}>Ghi chú:</div>
-              <ul style={{ paddingLeft: '25px', margin: 0, ...textStyle }}>
-                <li style={{ marginBottom: '8px' }}>
-                  LUTA LIFE được sản xuất trực tiếp tại USA. Nếu phát hiện hàng giả, hàng nhái, hàng kém chất lượng bồi thường 1.000 USD.
-                </li>
-                <li>
-                  LUTA LIFE được FDA và GMP chứng nhận an toàn lành tính vì được chiết xuất từ thiên nhiên như hoa hòe, hoa dâm bụt, củ tỏi...
-                </li>
-              </ul>
-            </div>
-
-            <div style={{ marginBottom: '30px' }}>
-              <div style={{ ...labelStyle, textDecoration: 'underline', marginBottom: '10px' }}>Yêu Cầu Bệnh Nhân:</div>
-              <ul style={{ paddingLeft: '25px', margin: 0, ...textStyle }}>
-                <li style={{ marginBottom: '8px' }}>
-                  Dùng đúng - đủ - đều theo liệu trình và phác đồ điều trị mà chuyên gia đưa ra.
-                </li>
-                <li style={{ marginBottom: '8px' }}>
-                  Đo và theo dõi chỉ số huyết áp thường xuyên.
-                </li>
-                <li>
-                  10 ngày chuyên gia sẽ liên hệ theo dõi và xem hiệu quả của thuốc với bệnh nhân.
-                </li>
-              </ul>
-            </div>
-
-            <Divider style={{ borderTop: '1px solid #ccc', margin: '20px 0' }} />
-
-            <div style={{ marginTop: '30px' }}>
+            {/* PHẦN CHÂN TRANG */}
+            <div style={{ marginTop: 'auto', borderTop: '1px solid #ccc', paddingTop: '20px' }}>
               <div style={{ ...textStyle, fontStyle: 'italic', marginBottom: '15px' }}>Mọi thắc mắc xin liên hệ:</div>
               <div style={{ marginLeft: '10px' }}>
                 <Row style={{ marginBottom: '8px' }}>
