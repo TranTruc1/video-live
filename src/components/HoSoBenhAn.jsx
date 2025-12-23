@@ -1,12 +1,12 @@
 import React, { useState, useRef } from 'react';
-import { Button, Input, Modal, message, Row, Col, Divider } from 'antd';
+import { Button, Input, Modal, message, Row, Col, Divider, Select } from 'antd'; // Thêm Select
 import { DownloadOutlined, EyeOutlined } from '@ant-design/icons';
 import html2canvas from 'html2canvas';
 
 const { TextArea } = Input;
 
-// --- COMPONENT Ô NHẬP LIỆU ---
-const EditableField = ({ value, onChange, placeholder, multiline = false, style, bold = false }) => {
+// --- COMPONENT Ô NHẬP LIỆU ĐA NĂNG (TEXT/SELECT) ---
+const EditableField = ({ value, onChange, placeholder, multiline = false, style, bold = false, options = [] }) => {
   const [editing, setEditing] = useState(false);
   const [tempValue, setTempValue] = useState(value);
 
@@ -20,9 +20,9 @@ const EditableField = ({ value, onChange, placeholder, multiline = false, style,
     onChange(tempValue);
   };
 
-  // GIỮ NGUYÊN SIZE 14PT CỐ ĐỊNH (Không dùng clamp nữa vì đã có scroll)
+  // Style chung
   const commonStyle = {
-    fontSize: '14pt', 
+    fontSize: '14pt',
     fontFamily: 'Arial, sans-serif',
     fontWeight: bold ? 'bold' : 'normal',
     color: '#000',
@@ -30,16 +30,44 @@ const EditableField = ({ value, onChange, placeholder, multiline = false, style,
   };
 
   if (editing) {
-    return multiline ? (
-      <TextArea
-        autoFocus
-        value={tempValue}
-        onChange={(e) => setTempValue(e.target.value)}
-        onBlur={saveEdit}
-        autoSize={{ minRows: 2, maxRows: 6 }}
-        style={{ ...commonStyle, width: '100%', padding: '5px' }}
-      />
-    ) : (
+    // 1. Nếu có danh sách options -> Hiển thị Select box
+    if (options && options.length > 0) {
+      return (
+        <Select
+          defaultOpen={true} // Tự động mở menu khi click vào
+          autoFocus={true}
+          value={tempValue}
+          style={{ ...commonStyle, width: '100%' }}
+          onChange={(val) => {
+            setTempValue(val);
+            onChange(val); // Lưu ngay khi chọn
+            setEditing(false); // Tắt chế độ sửa
+          }}
+          onBlur={() => {
+            setEditing(false); // Tắt khi click ra ngoài
+          }}
+          options={options.map(opt => ({ label: opt, value: opt }))}
+          dropdownStyle={{ minWidth: '300px' }} // Đảm bảo menu đủ rộng để đọc
+        />
+      );
+    }
+
+    // 2. Nếu là multiline -> Hiển thị TextArea
+    if (multiline) {
+      return (
+        <TextArea
+          autoFocus
+          value={tempValue}
+          onChange={(e) => setTempValue(e.target.value)}
+          onBlur={saveEdit}
+          autoSize={{ minRows: 2, maxRows: 6 }}
+          style={{ ...commonStyle, width: '100%', padding: '5px' }}
+        />
+      );
+    }
+
+    // 3. Mặc định -> Hiển thị Input thường
+    return (
       <Input
         autoFocus
         value={tempValue}
@@ -51,6 +79,7 @@ const EditableField = ({ value, onChange, placeholder, multiline = false, style,
     );
   }
 
+  // --- CHẾ ĐỘ HIỂN THỊ (VIEW MODE) ---
   return (
     <div
       onClick={toggleEdit}
@@ -90,8 +119,17 @@ const HoSoBenhAn = () => {
     contactPhone: '+1 832-650-2216',
     contactMail: 'lutalifeusa@gmail.com',
     contactWeb: 'https://lutalifeusa.online',
-    contactAddress: 'Pagemill Rd , Dallas, TX, United States, Texas'
+    contactAddress: 'Pagemill Rd , Dallas, TX, United States, Texas' // Giá trị mặc định
   });
+
+  // DANH SÁCH ĐỊA CHỈ ĐỂ CHỌN
+  const addressOptions = [
+    "Pagemill Rd , Dallas, TX, United States, Texas",
+    "2334 Dorrington St Houston, Texas",
+    "1841 1/2 N Alexandria Ave, Los Angeles, CA 90027",
+    "2 Bradnor St, Carina QLD 4152, Úc",
+    "2015 Av. Bergemont, Quebec, QC G1J 3T5, Canada"
+  ];
 
   const printRef = useRef(null);
   const [previewImage, setPreviewImage] = useState(null);
@@ -129,7 +167,6 @@ const HoSoBenhAn = () => {
     }
   };
 
-  // Font size cố định 14pt
   const labelStyle = { fontWeight: 'bold', fontSize: '14pt', marginRight: '5px', fontFamily: 'Arial, sans-serif' };
   const textStyle = { fontWeight: 'normal', fontSize: '14pt', fontFamily: 'Arial, sans-serif' };
   
@@ -144,24 +181,21 @@ const HoSoBenhAn = () => {
       </div>
 
       {/* --- WRAPPER CUỘN NGANG --- */}
-      {/* Đây là khung bao bên ngoài để tạo thanh cuộn nếu màn hình nhỏ hơn 794px */}
       <div style={{ 
           width: '100%', 
-          overflowX: 'auto', // Tự động hiện thanh cuộn ngang
+          overflowX: 'auto', 
           display: 'flex', 
-          justifyContent: 'center', // Căn giữa nếu màn hình to
-          paddingBottom: '20px' // Khoảng cách để thanh cuộn không dính sát
+          justifyContent: 'center', 
+          paddingBottom: '20px' 
       }}>
           
           {/* KHUVỰC GIẤY A4 CỐ ĐỊNH */}
           <div
             ref={printRef}
             style={{
-              // KÍCH THƯỚC CỐ ĐỊNH CHUẨN A4
               width: '794px',
               minHeight: '1123px', 
-              flexShrink: 0, // Không cho phép co lại
-              
+              flexShrink: 0, 
               position: 'relative',
               background: '#fff',
               boxSizing: 'border-box',
@@ -207,8 +241,7 @@ const HoSoBenhAn = () => {
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                // Padding chuẩn như cũ
-                padding: '90px 90px 100px 90px', 
+                padding: '120px 90px 100px 90px', 
                 fontFamily: 'Arial, sans-serif',
                 fontSize: '14pt',
                 lineHeight: '1.5',
@@ -274,7 +307,7 @@ const HoSoBenhAn = () => {
 
                       <Row style={{ marginBottom: '10px' }}>
                         <Col span={24} style={{ display: 'flex', alignItems: 'center' }}>
-                          <span style={labelStyle}>Tình trạng bệnh:</span>
+                          <span style={labelStyle}>Tình trạng:</span>
                           <EditableField value={data.status} onChange={(val) => handleChange('status', val)} placeholder="Nhập tình trạng bệnh..." style={{ flex: 1 }} />
                         </Col>
                       </Row>
@@ -342,7 +375,12 @@ const HoSoBenhAn = () => {
                     <Row>
                       <Col span={6}><span style={labelStyle}>Địa chỉ:</span></Col>
                       <Col span={18}>
-                        <EditableField value={data.contactAddress} onChange={(val) => handleChange('contactAddress', val)} multiline={true} />
+                        {/* --- SỬ DỤNG SELECT BOX CHO ĐỊA CHỈ LIÊN HỆ --- */}
+                        <EditableField 
+                          value={data.contactAddress} 
+                          onChange={(val) => handleChange('contactAddress', val)} 
+                          options={addressOptions} // Truyền danh sách địa chỉ vào
+                        />
                       </Col>
                     </Row>
                   </div>
