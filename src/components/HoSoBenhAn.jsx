@@ -20,10 +20,9 @@ const EditableField = ({ value, onChange, placeholder, multiline = false, style,
     onChange(tempValue);
   };
 
-  // Style chung cho chữ: Arial, 14pt. 
-  // Sử dụng 'clamp' cho fontSize để chữ tự nhỏ lại một chút trên màn hình quá bé, tránh vỡ layout
+  // Style chung cho chữ: Arial, 14pt
   const commonStyle = {
-    fontSize: 'clamp(11pt, 2vw, 14pt)', 
+    fontSize: '14pt',
     fontFamily: 'Arial, sans-serif',
     fontWeight: bold ? 'bold' : 'normal',
     color: '#000',
@@ -107,8 +106,8 @@ const HoSoBenhAn = () => {
     if (printRef.current) {
       try {
         const canvas = await html2canvas(printRef.current, {
-          scale: 3, // Tăng độ nét khi in
-          useCORS: true, 
+          scale: 3, // Tăng độ nét
+          useCORS: true, // Cho phép tải ảnh từ nguồn ngoài/local
           backgroundColor: '#ffffff',
         });
 
@@ -131,12 +130,11 @@ const HoSoBenhAn = () => {
     }
   };
 
-  // Sử dụng clamp cho font size tiêu đề để nó linh hoạt hơn
-  const labelStyle = { fontWeight: 'bold', fontSize: 'clamp(11pt, 2vw, 14pt)', marginRight: '5px', fontFamily: 'Arial, sans-serif' };
-  const textStyle = { fontWeight: 'normal', fontSize: 'clamp(11pt, 2vw, 14pt)', fontFamily: 'Arial, sans-serif' };
+  const labelStyle = { fontWeight: 'bold', fontSize: '14pt', marginRight: '5px', fontFamily: 'Arial, sans-serif' };
+  const textStyle = { fontWeight: 'normal', fontSize: '14pt', fontFamily: 'Arial, sans-serif' };
   
   return (
-    <div style={{ background: '#333', padding: '20px', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <div style={{ background: '#333', padding: '30px', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
       {/* THANH CÔNG CỤ */}
       <div style={{ marginBottom: '20px' }}>
@@ -145,22 +143,16 @@ const HoSoBenhAn = () => {
         </Button>
       </div>
 
-      {/* KHUVỰC GIẤY A4 - ĐÃ SỬA RESPONSIVE */}
+      {/* KHUVỰC GIẤY A4 */}
       <div
         ref={printRef}
         style={{
-          // --- CẤU HÌNH RESPONSIVE A4 MỚI ---
-          width: '100%',           // Chiếm hết chiều ngang màn hình điện thoại
-          maxWidth: '794px',       // Nhưng không rộng quá 794px trên máy tính
-          aspectRatio: '210 / 297', // Tự động tính chiều cao theo tỉ lệ chuẩn giấy A4.
-          
-          // --- Styles khác ---
+          width: '794px',
+          minHeight: '1123px',
           position: 'relative',
           background: '#fff',
           boxSizing: 'border-box',
-          overflow: 'hidden',
-          boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)', // Thêm bóng
-          margin: '0 auto' // Căn giữa
+          overflow: 'hidden'
         }}
       >
         
@@ -203,21 +195,23 @@ const HoSoBenhAn = () => {
             display: 'flex',
             flexDirection: 'column',
             
-            // Căn chỉnh khoảng cách chữ so với viền khung. 
-            // Sử dụng % để padding co giãn theo màn hình
-            padding: '15% 11% 12% 11%', 
+            // Căn chỉnh khoảng cách chữ so với viền khung
+            // Top: 120px (để tiêu đề thấp xuống)
+            // Bottom: 100px (để chân trang cách đáy)
+            // Left/Right: 90px (lùi vào trong cho thoáng)
+            padding: '120px 90px 100px 90px', 
             
             fontFamily: 'Arial, sans-serif',
-            // fontSize base, các thành phần con sẽ dùng clamp
+            fontSize: '14pt',
+            lineHeight: '1.5',
             color: '#000',
         }}>
             
             {/* PHẦN THÂN TRÊN */}
             <div>
-                <div style={{ textAlign: 'center', marginBottom: '5%' }}>
+                <div style={{ textAlign: 'center', marginBottom: '40px' }}>
                   <h1 style={{
-                    fontSize: 'clamp(18pt, 4vw, 24pt)', // Tiêu đề tự co giãn
-                    fontWeight: 'bold', textTransform: 'uppercase',
+                    fontSize: '24pt', fontWeight: 'bold', textTransform: 'uppercase',
                     margin: 0, paddingBottom: '10px', display: 'inline-block',
                     fontFamily: 'Arial, sans-serif', borderBottom: '2px solid #000'
                   }}>
@@ -243,16 +237,16 @@ const HoSoBenhAn = () => {
 
                   {/* TUỔI VÀ SỐ PHONE (CHUNG DÒNG) */}
                   <Row gutter={24} style={{ marginBottom: '10px' }}>
-                    <Col span={10} style={{ display: 'flex', alignItems: 'center' }}>
+                    <Col span={8} style={{ display: 'flex', alignItems: 'center' }}>
                       <span style={labelStyle}>Tuổi:</span>
                       <EditableField 
                         value={data.age} 
                         onChange={(val) => handleChange('age', val)} 
                         placeholder="50" 
-                        style={{ width: '50px', textAlign: 'center' }} 
+                        style={{ width: '60px', textAlign: 'center' }} 
                       />
                     </Col>
-                    <Col span={14} style={{ display: 'flex', alignItems: 'center' }}>
+                    <Col span={16} style={{ display: 'flex', alignItems: 'center' }}>
                       <span style={labelStyle}>Số Phone:</span>
                       <EditableField 
                         value={data.phone} 
@@ -320,26 +314,26 @@ const HoSoBenhAn = () => {
               <div style={{ ...textStyle, fontStyle: 'italic', marginBottom: '15px' }}>Mọi thắc mắc xin liên hệ:</div>
               <div style={{ marginLeft: '10px' }}>
                 <Row style={{ marginBottom: '8px' }}>
-                  <Col span={6}><span style={labelStyle}>Số phone:</span></Col>
-                  <Col span={18}>
+                  <Col span={4}><span style={labelStyle}>Số phone:</span></Col>
+                  <Col span={20}>
                     <EditableField value={data.contactPhone} onChange={(val) => handleChange('contactPhone', val)} />
                   </Col>
                 </Row>
                 <Row style={{ marginBottom: '8px' }}>
-                  <Col span={6}><span style={labelStyle}>Mail:</span></Col>
-                  <Col span={18}>
+                  <Col span={4}><span style={labelStyle}>Mail:</span></Col>
+                  <Col span={20}>
                     <EditableField value={data.contactMail} onChange={(val) => handleChange('contactMail', val)} />
                   </Col>
                 </Row>
                 <Row style={{ marginBottom: '8px' }}>
-                  <Col span={6}><span style={labelStyle}>Web:</span></Col>
-                  <Col span={18}>
+                  <Col span={4}><span style={labelStyle}>Web:</span></Col>
+                  <Col span={20}>
                     <EditableField value={data.contactWeb} onChange={(val) => handleChange('contactWeb', val)} />
                   </Col>
                 </Row>
                 <Row>
-                  <Col span={6}><span style={labelStyle}>Địa chỉ:</span></Col>
-                  <Col span={18}>
+                  <Col span={4}><span style={labelStyle}>Địa chỉ:</span></Col>
+                  <Col span={20}>
                     <EditableField value={data.contactAddress} onChange={(val) => handleChange('contactAddress', val)} multiline={true} />
                   </Col>
                 </Row>
@@ -362,7 +356,6 @@ const HoSoBenhAn = () => {
         ]}
         width={700}
         centered
-        style={{ maxWidth: '95vw' }} // Đảm bảo modal không bị quá to trên đt
       >
         <div style={{ textAlign: 'center' }}>
             {/* HƯỚNG DẪN DÀNH RIÊNG CHO IPHONE */}
