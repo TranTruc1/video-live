@@ -20,9 +20,9 @@ const EditableField = ({ value, onChange, placeholder, multiline = false, style,
     onChange(tempValue);
   };
 
-  // Style chung cho chữ: Arial, 14pt
+  // GIỮ NGUYÊN SIZE 14PT CỐ ĐỊNH (Không dùng clamp nữa vì đã có scroll)
   const commonStyle = {
-    fontSize: '14pt',
+    fontSize: '14pt', 
     fontFamily: 'Arial, sans-serif',
     fontWeight: bold ? 'bold' : 'normal',
     color: '#000',
@@ -67,7 +67,6 @@ const EditableField = ({ value, onChange, placeholder, multiline = false, style,
       {value ? (
         value
       ) : (
-        // data-html2canvas-ignore giúp ẩn chữ gợi ý khi xuất ảnh
         <span
           data-html2canvas-ignore="true"
           style={{ color: '#ccc', fontStyle: 'italic', fontWeight: 'normal' }}
@@ -106,8 +105,8 @@ const HoSoBenhAn = () => {
     if (printRef.current) {
       try {
         const canvas = await html2canvas(printRef.current, {
-          scale: 3, // Tăng độ nét
-          useCORS: true, // Cho phép tải ảnh từ nguồn ngoài/local
+          scale: 3, 
+          useCORS: true, 
           backgroundColor: '#ffffff',
         });
 
@@ -130,11 +129,12 @@ const HoSoBenhAn = () => {
     }
   };
 
+  // Font size cố định 14pt
   const labelStyle = { fontWeight: 'bold', fontSize: '14pt', marginRight: '5px', fontFamily: 'Arial, sans-serif' };
   const textStyle = { fontWeight: 'normal', fontSize: '14pt', fontFamily: 'Arial, sans-serif' };
   
   return (
-    <div style={{ background: '#333', padding: '30px', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <div style={{ background: '#333', padding: '20px 0', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
       {/* THANH CÔNG CỤ */}
       <div style={{ marginBottom: '20px' }}>
@@ -143,207 +143,216 @@ const HoSoBenhAn = () => {
         </Button>
       </div>
 
-      {/* KHUVỰC GIẤY A4 */}
-      <div
-        ref={printRef}
-        style={{
-          width: '794px',
-          minHeight: '1123px',
-          position: 'relative',
-          background: '#fff',
-          boxSizing: 'border-box',
-          overflow: 'hidden'
-        }}
-      >
-        
-        {/* --- LAYER 0: ẢNH KHUNG VIỀN NỀN (public/khung.png) --- */}
-        <img 
-          src="/khung.png" 
-          alt="Khung nền"
-          style={{
-            position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-            objectFit: 'stretch', zIndex: 0,
-          }}
-          onError={(e) => {
-             e.target.style.display = 'none';
-             message.warning('Chưa tìm thấy file public/khung.png');
-          }}
-        />
-
-        {/* --- LAYER 1: LOGO CHÌM GIỮA MÀN HÌNH (public/logo.png) --- */}
-        <div
-          style={{
-            position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-            width: '30%', opacity: 0.15, pointerEvents: 'none', zIndex: 1,
-            textAlign: 'center', display: 'flex', justifyContent: 'center', alignItems: 'center'
-          }}
-        >
-          <img
-            src="./logo.png"
-            alt="LUTA LIFE Logo"
-            onError={(e) => { e.target.style.display = 'none'; }}
-            style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
-          />
-        </div>
-
-        {/* --- LAYER 2: NỘI DUNG VĂN BẢN --- */}
-        <div style={{ 
-            position: 'relative', 
-            zIndex: 2,
-            height: '100%',
-            // Flexbox giúp đẩy phần Chân trang xuống đáy
-            display: 'flex',
-            flexDirection: 'column',
+      {/* --- WRAPPER CUỘN NGANG --- */}
+      {/* Đây là khung bao bên ngoài để tạo thanh cuộn nếu màn hình nhỏ hơn 794px */}
+      <div style={{ 
+          width: '100%', 
+          overflowX: 'auto', // Tự động hiện thanh cuộn ngang
+          display: 'flex', 
+          justifyContent: 'center', // Căn giữa nếu màn hình to
+          paddingBottom: '20px' // Khoảng cách để thanh cuộn không dính sát
+      }}>
+          
+          {/* KHUVỰC GIẤY A4 CỐ ĐỊNH */}
+          <div
+            ref={printRef}
+            style={{
+              // KÍCH THƯỚC CỐ ĐỊNH CHUẨN A4
+              width: '794px',
+              minHeight: '1123px', 
+              flexShrink: 0, // Không cho phép co lại
+              
+              position: 'relative',
+              background: '#fff',
+              boxSizing: 'border-box',
+              overflow: 'hidden',
+              boxShadow: '0 10px 20px rgba(0,0,0,0.19)',
+            }}
+          >
             
-            // Căn chỉnh khoảng cách chữ so với viền khung
-            // Top: 120px (để tiêu đề thấp xuống)
-            // Bottom: 100px (để chân trang cách đáy)
-            // Left/Right: 90px (lùi vào trong cho thoáng)
-            padding: '120px 90px 100px 90px', 
-            
-            fontFamily: 'Arial, sans-serif',
-            fontSize: '14pt',
-            lineHeight: '1.5',
-            color: '#000',
-        }}>
-            
-            {/* PHẦN THÂN TRÊN */}
-            <div>
-                <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-                  <h1 style={{
-                    fontSize: '24pt', fontWeight: 'bold', textTransform: 'uppercase',
-                    margin: 0, paddingBottom: '10px', display: 'inline-block',
-                    fontFamily: 'Arial, sans-serif', borderBottom: '2px solid #000'
-                  }}>
-                    HỒ SƠ BỆNH ÁN
-                  </h1>
-                </div>
+            {/* LAYER 0: KHUNG NỀN */}
+            <img 
+              src="/khung.png" 
+              alt="Khung nền"
+              style={{
+                position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                objectFit: 'stretch', zIndex: 0,
+              }}
+              onError={(e) => {
+                 e.target.style.display = 'none';
+                 message.warning('Chưa tìm thấy file public/khung.png');
+              }}
+            />
 
-                <div style={{ marginBottom: '20px' }}>
-                  
-                  {/* HỌ TÊN (FULL DÒNG) */}
-                  <Row style={{ marginBottom: '10px' }}>
-                    <Col span={24} style={{ display: 'flex', alignItems: 'center' }}>
-                      <span style={labelStyle}>Họ Tên Người Bệnh:</span>
-                      <EditableField
-                        value={data.name}
-                        onChange={(val) => handleChange('name', val)}
-                        placeholder="Nguyễn Văn A"
-                        style={{ ...textStyle, flex: 1, textTransform: 'uppercase' }}
-                        bold={true}
-                      />
-                    </Col>
-                  </Row>
-
-                  {/* TUỔI VÀ SỐ PHONE (CHUNG DÒNG) */}
-                  <Row gutter={24} style={{ marginBottom: '10px' }}>
-                    <Col span={8} style={{ display: 'flex', alignItems: 'center' }}>
-                      <span style={labelStyle}>Tuổi:</span>
-                      <EditableField 
-                        value={data.age} 
-                        onChange={(val) => handleChange('age', val)} 
-                        placeholder="50" 
-                        style={{ width: '60px', textAlign: 'center' }} 
-                      />
-                    </Col>
-                    <Col span={16} style={{ display: 'flex', alignItems: 'center' }}>
-                      <span style={labelStyle}>Số Phone:</span>
-                      <EditableField 
-                        value={data.phone} 
-                        onChange={(val) => handleChange('phone', val)} 
-                        placeholder="09xx..." 
-                        style={{ flex: 1 }} 
-                      />
-                    </Col>
-                  </Row>
-
-                  <Row style={{ marginBottom: '10px' }}>
-                    <Col span={24} style={{ display: 'flex', alignItems: 'baseline' }}>
-                      <span style={labelStyle}>Địa chỉ:</span>
-                      <EditableField value={data.address} onChange={(val) => handleChange('address', val)} placeholder="Nhập địa chỉ..." style={{ flex: 1 }} multiline={true} />
-                    </Col>
-                  </Row>
-
-                  <Row style={{ marginBottom: '10px' }}>
-                    <Col span={24} style={{ display: 'flex', alignItems: 'center' }}>
-                      <span style={labelStyle}>Tình trạng:</span>
-                      <EditableField value={data.status} onChange={(val) => handleChange('status', val)} placeholder="Nhập tình trạng bệnh..." style={{ flex: 1 }} />
-                    </Col>
-                  </Row>
-
-                  <Row style={{ marginBottom: '10px' }}>
-                    <Col span={24} style={{ display: 'flex', alignItems: 'center' }}>
-                      <span style={labelStyle}>Ngày Đặt Hàng:</span>
-                      <EditableField value={data.orderDate} onChange={(val) => handleChange('orderDate', val)} />
-                    </Col>
-                  </Row>
-                </div>
-
-                <Divider style={{ borderTop: '1px solid #ccc', margin: '20px 0' }} />
-
-                <div style={{ marginBottom: '25px' }}>
-                  <div style={{ ...labelStyle, textDecoration: 'underline', marginBottom: '10px' }}>Ghi chú:</div>
-                  <ul style={{ paddingLeft: '25px', margin: 0, ...textStyle }}>
-                    <li style={{ marginBottom: '8px' }}>
-                      LUTA LIFE được sản xuất trực tiếp tại USA. Nếu phát hiện hàng giả, hàng nhái, hàng kém chất lượng bồi thường 1.000 USD.
-                    </li>
-                    <li>
-                      LUTA LIFE được FDA và GMP chứng nhận an toàn lành tính vì được chiết xuất từ thiên nhiên như hoa hòe, hoa dâm bụt, củ tỏi...
-                    </li>
-                  </ul>
-                </div>
-
-                <div style={{ marginBottom: '30px' }}>
-                  <div style={{ ...labelStyle, textDecoration: 'underline', marginBottom: '10px' }}>Yêu Cầu Bệnh Nhân:</div>
-                  <ul style={{ paddingLeft: '25px', margin: 0, ...textStyle }}>
-                    <li style={{ marginBottom: '8px' }}>
-                      Dùng đúng - đủ - đều theo liệu trình và phác đồ điều trị mà chuyên gia đưa ra.
-                    </li>
-                    <li style={{ marginBottom: '8px' }}>
-                      Đo và theo dõi chỉ số huyết áp thường xuyên.
-                    </li>
-                    <li>
-                      10 ngày chuyên gia sẽ liên hệ theo dõi và xem hiệu quả của thuốc với bệnh nhân.
-                    </li>
-                  </ul>
-                </div>
+            {/* LAYER 1: LOGO CHÌM */}
+            <div
+              style={{
+                position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+                width: '30%', opacity: 0.15, pointerEvents: 'none', zIndex: 1,
+                textAlign: 'center', display: 'flex', justifyContent: 'center', alignItems: 'center'
+              }}
+            >
+              <img
+                src="./logo.png"
+                alt="LUTA LIFE Logo"
+                onError={(e) => { e.target.style.display = 'none'; }}
+                style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
+              />
             </div>
 
-            {/* PHẦN CHÂN TRANG (TỰ ĐỘNG ĐẨY XUỐNG ĐÁY) */}
-            <div style={{ marginTop: 'auto', borderTop: '1px solid #ccc', paddingTop: '20px' }}>
-              <div style={{ ...textStyle, fontStyle: 'italic', marginBottom: '15px' }}>Mọi thắc mắc xin liên hệ:</div>
-              <div style={{ marginLeft: '10px' }}>
-                <Row style={{ marginBottom: '8px' }}>
-                  <Col span={4}><span style={labelStyle}>Số phone:</span></Col>
-                  <Col span={20}>
-                    <EditableField value={data.contactPhone} onChange={(val) => handleChange('contactPhone', val)} />
-                  </Col>
-                </Row>
-                <Row style={{ marginBottom: '8px' }}>
-                  <Col span={4}><span style={labelStyle}>Mail:</span></Col>
-                  <Col span={20}>
-                    <EditableField value={data.contactMail} onChange={(val) => handleChange('contactMail', val)} />
-                  </Col>
-                </Row>
-                <Row style={{ marginBottom: '8px' }}>
-                  <Col span={4}><span style={labelStyle}>Web:</span></Col>
-                  <Col span={20}>
-                    <EditableField value={data.contactWeb} onChange={(val) => handleChange('contactWeb', val)} />
-                  </Col>
-                </Row>
-                <Row>
-                  <Col span={4}><span style={labelStyle}>Địa chỉ:</span></Col>
-                  <Col span={20}>
-                    <EditableField value={data.contactAddress} onChange={(val) => handleChange('contactAddress', val)} multiline={true} />
-                  </Col>
-                </Row>
-              </div>
-            </div>
+            {/* LAYER 2: NỘI DUNG VĂN BẢN */}
+            <div style={{ 
+                position: 'relative', 
+                zIndex: 2,
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                // Padding chuẩn như cũ
+                padding: '120px 90px 100px 90px', 
+                fontFamily: 'Arial, sans-serif',
+                fontSize: '14pt',
+                lineHeight: '1.5',
+                color: '#000',
+            }}>
+                
+                {/* PHẦN THÂN TRÊN */}
+                <div>
+                    <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+                      <h1 style={{
+                        fontSize: '24pt', fontWeight: 'bold', textTransform: 'uppercase',
+                        margin: 0, paddingBottom: '10px', display: 'inline-block',
+                        fontFamily: 'Arial, sans-serif', borderBottom: '2px solid #000'
+                      }}>
+                        HỒ SƠ BỆNH ÁN
+                      </h1>
+                    </div>
 
-        </div>
+                    <div style={{ marginBottom: '20px' }}>
+                      
+                      {/* HỌ TÊN (FULL DÒNG) */}
+                      <Row style={{ marginBottom: '10px' }}>
+                        <Col span={24} style={{ display: 'flex', alignItems: 'center' }}>
+                          <span style={labelStyle}>Họ Tên Người Bệnh:</span>
+                          <EditableField
+                            value={data.name}
+                            onChange={(val) => handleChange('name', val)}
+                            placeholder="Nguyễn Văn A"
+                            style={{ ...textStyle, flex: 1, textTransform: 'uppercase' }}
+                            bold={true}
+                          />
+                        </Col>
+                      </Row>
+
+                      {/* TUỔI VÀ SỐ PHONE (CHUNG DÒNG) */}
+                      <Row gutter={24} style={{ marginBottom: '10px' }}>
+                        <Col span={8} style={{ display: 'flex', alignItems: 'center' }}>
+                          <span style={labelStyle}>Tuổi:</span>
+                          <EditableField 
+                            value={data.age} 
+                            onChange={(val) => handleChange('age', val)} 
+                            placeholder="50" 
+                            style={{ width: '60px', textAlign: 'center' }} 
+                          />
+                        </Col>
+                        <Col span={16} style={{ display: 'flex', alignItems: 'center' }}>
+                          <span style={labelStyle}>Số Phone:</span>
+                          <EditableField 
+                            value={data.phone} 
+                            onChange={(val) => handleChange('phone', val)} 
+                            placeholder="09xx..." 
+                            style={{ flex: 1 }} 
+                          />
+                        </Col>
+                      </Row>
+
+                      <Row style={{ marginBottom: '10px' }}>
+                        <Col span={24} style={{ display: 'flex', alignItems: 'baseline' }}>
+                          <span style={labelStyle}>Địa chỉ:</span>
+                          <EditableField value={data.address} onChange={(val) => handleChange('address', val)} placeholder="Nhập địa chỉ..." style={{ flex: 1 }} multiline={true} />
+                        </Col>
+                      </Row>
+
+                      <Row style={{ marginBottom: '10px' }}>
+                        <Col span={24} style={{ display: 'flex', alignItems: 'center' }}>
+                          <span style={labelStyle}>Tình trạng:</span>
+                          <EditableField value={data.status} onChange={(val) => handleChange('status', val)} placeholder="Nhập tình trạng bệnh..." style={{ flex: 1 }} />
+                        </Col>
+                      </Row>
+
+                      <Row style={{ marginBottom: '10px' }}>
+                        <Col span={24} style={{ display: 'flex', alignItems: 'center' }}>
+                          <span style={labelStyle}>Ngày Đặt Hàng:</span>
+                          <EditableField value={data.orderDate} onChange={(val) => handleChange('orderDate', val)} />
+                        </Col>
+                      </Row>
+                    </div>
+
+                    <Divider style={{ borderTop: '1px solid #ccc', margin: '20px 0' }} />
+
+                    <div style={{ marginBottom: '25px' }}>
+                      <div style={{ ...labelStyle, textDecoration: 'underline', marginBottom: '10px' }}>Ghi chú:</div>
+                      <ul style={{ paddingLeft: '25px', margin: 0, ...textStyle }}>
+                        <li style={{ marginBottom: '8px' }}>
+                          LUTA LIFE được sản xuất trực tiếp tại USA. Nếu phát hiện hàng giả, hàng nhái, hàng kém chất lượng bồi thường 1.000 USD.
+                        </li>
+                        <li>
+                          LUTA LIFE được FDA và GMP chứng nhận an toàn lành tính vì được chiết xuất từ thiên nhiên như hoa hòe, hoa dâm bụt, củ tỏi...
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div style={{ marginBottom: '30px' }}>
+                      <div style={{ ...labelStyle, textDecoration: 'underline', marginBottom: '10px' }}>Yêu Cầu Bệnh Nhân:</div>
+                      <ul style={{ paddingLeft: '25px', margin: 0, ...textStyle }}>
+                        <li style={{ marginBottom: '8px' }}>
+                          Dùng đúng - đủ - đều theo liệu trình và phác đồ điều trị mà chuyên gia đưa ra.
+                        </li>
+                        <li style={{ marginBottom: '8px' }}>
+                          Đo và theo dõi chỉ số huyết áp thường xuyên.
+                        </li>
+                        <li>
+                          10 ngày chuyên gia sẽ liên hệ theo dõi và xem hiệu quả của thuốc với bệnh nhân.
+                        </li>
+                      </ul>
+                    </div>
+                </div>
+
+                {/* PHẦN CHÂN TRANG */}
+                <div style={{ marginTop: 'auto', borderTop: '1px solid #ccc', paddingTop: '20px' }}>
+                  <div style={{ ...textStyle, fontStyle: 'italic', marginBottom: '15px' }}>Mọi thắc mắc xin liên hệ:</div>
+                  <div style={{ marginLeft: '10px' }}>
+                    <Row style={{ marginBottom: '8px' }}>
+                      <Col span={6}><span style={labelStyle}>Số phone:</span></Col>
+                      <Col span={18}>
+                        <EditableField value={data.contactPhone} onChange={(val) => handleChange('contactPhone', val)} />
+                      </Col>
+                    </Row>
+                    <Row style={{ marginBottom: '8px' }}>
+                      <Col span={6}><span style={labelStyle}>Mail:</span></Col>
+                      <Col span={18}>
+                        <EditableField value={data.contactMail} onChange={(val) => handleChange('contactMail', val)} />
+                      </Col>
+                    </Row>
+                    <Row style={{ marginBottom: '8px' }}>
+                      <Col span={6}><span style={labelStyle}>Web:</span></Col>
+                      <Col span={18}>
+                        <EditableField value={data.contactWeb} onChange={(val) => handleChange('contactWeb', val)} />
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col span={6}><span style={labelStyle}>Địa chỉ:</span></Col>
+                      <Col span={18}>
+                        <EditableField value={data.contactAddress} onChange={(val) => handleChange('contactAddress', val)} multiline={true} />
+                      </Col>
+                    </Row>
+                  </div>
+                </div>
+
+            </div>
+          </div>
       </div>
 
-      {/* MODAL XEM TRƯỚC VÀ LƯU ẢNH */}
+      {/* MODAL */}
       <Modal
         title="Xem trước ảnh"
         open={isModalVisible}
@@ -356,9 +365,9 @@ const HoSoBenhAn = () => {
         ]}
         width={700}
         centered
+        style={{ maxWidth: '95vw' }}
       >
         <div style={{ textAlign: 'center' }}>
-            {/* HƯỚNG DẪN DÀNH RIÊNG CHO IPHONE */}
             <div style={{ 
                 marginBottom: '15px', 
                 padding: '10px', 
