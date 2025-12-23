@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Button, Input, Modal, message, Row, Col, Divider, Select } from 'antd'; // Thêm Select
+import { Button, Input, Modal, message, Row, Col, Divider, Select } from 'antd';
 import { DownloadOutlined, EyeOutlined } from '@ant-design/icons';
 import html2canvas from 'html2canvas';
 
@@ -20,7 +20,6 @@ const EditableField = ({ value, onChange, placeholder, multiline = false, style,
     onChange(tempValue);
   };
 
-  // Style chung
   const commonStyle = {
     fontSize: '14pt',
     fontFamily: 'Arial, sans-serif',
@@ -34,20 +33,25 @@ const EditableField = ({ value, onChange, placeholder, multiline = false, style,
     if (options && options.length > 0) {
       return (
         <Select
-          defaultOpen={true} // Tự động mở menu khi click vào
+          defaultOpen={true}
           autoFocus={true}
           value={tempValue}
           style={{ ...commonStyle, width: '100%' }}
           onChange={(val) => {
             setTempValue(val);
-            onChange(val); // Lưu ngay khi chọn
-            setEditing(false); // Tắt chế độ sửa
+            onChange(val);
+            setEditing(false);
           }}
           onBlur={() => {
-            setEditing(false); // Tắt khi click ra ngoài
+            setEditing(false);
           }}
-          options={options.map(opt => ({ label: opt, value: opt }))}
-          dropdownStyle={{ minWidth: '300px' }} // Đảm bảo menu đủ rộng để đọc
+          // --- SỬA Ở ĐÂY: Thêm index (1., 2., ...) vào label hiển thị ---
+          options={options.map((opt, index) => ({ 
+            label: `${index + 1}. ${opt}`, // Hiển thị: "1. Địa chỉ A"
+            value: opt                     // Giá trị thực: "Địa chỉ A"
+          }))}
+          // -----------------------------------------------------------
+          dropdownStyle={{ minWidth: '350px' }} // Menu rộng hơn chút để hiển thị đủ
         />
       );
     }
@@ -119,10 +123,10 @@ const HoSoBenhAn = () => {
     contactPhone: '+1 832-650-2216',
     contactMail: 'lutalifeusa@gmail.com',
     contactWeb: 'https://lutalifeusa.online',
-    contactAddress: 'Pagemill Rd , Dallas, TX, United States, Texas' // Giá trị mặc định
+    contactAddress: 'Pagemill Rd , Dallas, TX, United States, Texas'
   });
 
-  // DANH SÁCH ĐỊA CHỈ ĐỂ CHỌN
+  // DANH SÁCH ĐỊA CHỈ (Dữ liệu gốc)
   const addressOptions = [
     "Pagemill Rd , Dallas, TX, United States, Texas",
     "2334 Dorrington St Houston, Texas",
@@ -241,7 +245,7 @@ const HoSoBenhAn = () => {
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                padding: '120px 90px 100px 90px', 
+                padding: '80px 90px 100px 90px', 
                 fontFamily: 'Arial, sans-serif',
                 fontSize: '14pt',
                 lineHeight: '1.5',
@@ -262,7 +266,6 @@ const HoSoBenhAn = () => {
 
                     <div style={{ marginBottom: '20px' }}>
                       
-                      {/* HỌ TÊN (FULL DÒNG) */}
                       <Row style={{ marginBottom: '10px' }}>
                         <Col span={24} style={{ display: 'flex', alignItems: 'center' }}>
                           <span style={labelStyle}>Họ Tên Người Bệnh:</span>
@@ -276,7 +279,6 @@ const HoSoBenhAn = () => {
                         </Col>
                       </Row>
 
-                      {/* TUỔI VÀ SỐ PHONE (CHUNG DÒNG) */}
                       <Row gutter={24} style={{ marginBottom: '10px' }}>
                         <Col span={8} style={{ display: 'flex', alignItems: 'center' }}>
                           <span style={labelStyle}>Tuổi:</span>
@@ -375,11 +377,11 @@ const HoSoBenhAn = () => {
                     <Row>
                       <Col span={6}><span style={labelStyle}>Địa chỉ:</span></Col>
                       <Col span={18}>
-                        {/* --- SỬ DỤNG SELECT BOX CHO ĐỊA CHỈ LIÊN HỆ --- */}
+                        {/* SELECT BOX VỚI SỐ THỨ TỰ */}
                         <EditableField 
                           value={data.contactAddress} 
                           onChange={(val) => handleChange('contactAddress', val)} 
-                          options={addressOptions} // Truyền danh sách địa chỉ vào
+                          options={addressOptions} 
                         />
                       </Col>
                     </Row>
