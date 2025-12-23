@@ -89,7 +89,7 @@ const HoSoBenhAn = () => {
     
     // Thông tin liên hệ footer
     contactPhone: '+1 832-650-2216',
-    contactMail: 'support@lutalifeusa.online',
+    contactMail: 'lutalifeusa@gmail.com',
     contactWeb: 'https://lutalifeusa.online',
     contactAddress: 'Pagemill Rd , Dallas, TX, United States, Texas'
   });
