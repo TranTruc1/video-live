@@ -208,7 +208,7 @@ const HoSoBenhAn = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 // Padding chuẩn như cũ
-                padding: '120px 90px 100px 90px', 
+                padding: '90px 90px 100px 90px', 
                 fontFamily: 'Arial, sans-serif',
                 fontSize: '14pt',
                 lineHeight: '1.5',
