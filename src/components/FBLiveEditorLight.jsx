@@ -4,7 +4,7 @@ import {
   Image as ImageIcon, Clock, Eye,
   Maximize2, Minimize2, Settings, Plus, X,
   Menu, Save, CheckCircle, FileSpreadsheet, Download, Monitor,
-  Loader2, Layers // Thêm icon Layers
+  Loader2, Layers, Grid, Check // Thêm icon Grid và Check
 } from 'lucide-react';
 
 export default function FBLiveEditor() {
@@ -14,10 +14,15 @@ export default function FBLiveEditor() {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
 
+  // --- STATE: Gallery (Thư viện ảnh) ---
+  const [gallery, setGallery] = useState([]); // Danh sách ảnh trong thư viện
+  const [showGallery, setShowGallery] = useState(false); // Hiển thị modal thư viện
+  const [galleryTarget, setGalleryTarget] = useState(null); // Mục tiêu đang chọn ảnh: { type: 'new' | 'edit', id: ... }
+
   // --- STATE: Livestream Config ---
-  const [description, setDescription] = useState("Xả kho giá sốc!! Chốt đơn ngay 🔥🔥");
+  const [description, setDescription] = useState(" ");
   const [resolution, setResolution] = useState('720p'); 
-  const [isTransparentMode, setIsTransparentMode] = useState(false); // State mới: Chế độ tách nền
+  const [isTransparentMode, setIsTransparentMode] = useState(false);
 
   const RESOLUTIONS = {
     '720p':  { width: 720,  height: 1280, scale: 2, label: 'HD (720x1280)', bitrate: 5000000 },
@@ -132,10 +137,8 @@ export default function FBLiveEditor() {
     
     // 1. Xử lý Nền (Background)
     if (isTransparentMode) {
-        // Nếu đang bật chế độ tách nền: Xóa sạch canvas để tạo nền trong suốt
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     } else {
-        // Nếu không tách nền: Vẽ Video hoặc màu nền xám như bình thường
         if (video.readyState >= 2) {
             const vRatio = video.videoWidth / video.videoHeight;
             const cRatio = canvas.width / canvas.height;
@@ -338,7 +341,41 @@ export default function FBLiveEditor() {
     return () => cancelAnimationFrame(requestRef.current);
   }, [viewerConfig.current, description, scriptedComments, resolution, isProcessing, isPlaying, isTransparentMode]); 
 
-  // --- HANDLERS ---
+  // --- HANDLERS: Gallery & Images ---
+  const handleBulkImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    const newImages = files.map(file => ({
+        id: Date.now() + Math.random(),
+        url: URL.createObjectURL(file)
+    }));
+
+    setGallery(prev => [...prev, ...newImages]);
+  };
+
+  const openGallery = (type, id = null) => {
+      setGalleryTarget({ type, id });
+      setShowGallery(true);
+  };
+
+  const selectImageFromGallery = (imgUrl) => {
+      if (!galleryTarget) return;
+
+      const img = new Image();
+      img.src = imgUrl;
+
+      if (galleryTarget.type === 'new') {
+          setNewCmdAvatar(imgUrl);
+      } else if (galleryTarget.type === 'edit') {
+          setScriptedComments(prev => 
+            prev.map(c => c.id === galleryTarget.id ? { ...c, avatar: imgUrl, imgObj: img } : c)
+          );
+      }
+      setShowGallery(false);
+  };
+
+  // --- HANDLERS: Others ---
   const handleVideoUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -347,27 +384,10 @@ export default function FBLiveEditor() {
     }
   };
 
-  const handleAvatarUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        setNewCmdAvatar(URL.createObjectURL(file));
-    }
-  };
-
   const updateCommentTime = (id, newTime) => {
     setScriptedComments(prev => 
       prev.map(c => c.id === id ? { ...c, time: parseFloat(newTime) } : c)
           .sort((a, b) => a.time - b.time)
-    );
-  };
-
-  const updateCommentAvatar = (id, file) => {
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.src = url;
-    setScriptedComments(prev => 
-      prev.map(c => c.id === id ? { ...c, avatar: url, imgObj: img } : c)
     );
   };
 
@@ -470,7 +490,6 @@ export default function FBLiveEditor() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.style.display = "none"; a.href = url; 
-        // Thêm suffix _transparent nếu đang ở chế độ tách nền
         const suffix = isTransparentMode ? '_transparent' : '';
         a.download = `fb_live_${resolution}${suffix}_${Date.now()}.webm`;
         document.body.appendChild(a); a.click(); window.URL.revokeObjectURL(url);
@@ -534,7 +553,6 @@ export default function FBLiveEditor() {
                 <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
                     <h3 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2"><Monitor size={16}/> Cài đặt Video</h3>
                     
-                    {/* Chọn độ phân giải */}
                     <div className="mb-4">
                         <label className="text-xs text-gray-500 block mb-1">Độ phân giải xuất file</label>
                         <select 
@@ -665,17 +683,20 @@ export default function FBLiveEditor() {
                                      <span className="text-[9px] text-gray-400 mt-0.5">giây</span>
                                 </div>
 
-                                <label className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden mt-1 cursor-pointer relative group">
+                                {/* Avatar Trigger - Edit Mode */}
+                                <div 
+                                    onClick={() => openGallery('edit', c.id)}
+                                    className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden mt-1 cursor-pointer relative group"
+                                >
                                     {c.avatar ? (
                                         <img src={c.avatar} className="w-full h-full object-cover" alt="avatar" />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-xs font-bold text-gray-500">{c.name.charAt(0)}</div>
                                     )}
                                     <div className="absolute inset-0 bg-black/30 hidden group-hover:flex items-center justify-center transition-all">
-                                        <ImageIcon size={12} className="text-white opacity-90" />
+                                        <Grid size={12} className="text-white opacity-90" />
                                     </div>
-                                    <input type="file" accept="image/*" className="hidden" onChange={(e) => updateCommentAvatar(c.id, e.target.files[0])} />
-                                </label>
+                                </div>
 
                                 <div className="flex-1 min-w-0">
                                     <div className="text-sm font-semibold text-gray-800 truncate">{c.name}</div>
@@ -692,10 +713,13 @@ export default function FBLiveEditor() {
                 <div className="p-3 bg-gray-50 border-t border-gray-200">
                     <div className="flex gap-2 mb-2">
                         <div className="relative group w-10 h-10 flex-shrink-0">
-                            <label className="w-10 h-10 rounded-full border border-gray-300 bg-white flex items-center justify-center cursor-pointer overflow-hidden hover:border-blue-400">
-                                {newCmdAvatar ? <img src={newCmdAvatar} className="w-full h-full object-cover" alt="preview" /> : <ImageIcon size={16} className="text-gray-400"/>}
-                                <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
-                            </label>
+                            {/* Avatar Trigger - New Comment Mode */}
+                            <div 
+                                onClick={() => openGallery('new')}
+                                className="w-10 h-10 rounded-full border border-gray-300 bg-white flex items-center justify-center cursor-pointer overflow-hidden hover:border-blue-400 hover:bg-gray-100 transition"
+                            >
+                                {newCmdAvatar ? <img src={newCmdAvatar} className="w-full h-full object-cover" alt="preview" /> : <Grid size={16} className="text-gray-400"/>}
+                            </div>
                         </div>
                         <input value={newCmdName} onChange={e=>setNewCmdName(e.target.value)} placeholder="Tên khách..." className="flex-1 border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500" />
                         <div className="flex items-center bg-white border border-gray-300 rounded px-2 w-24">
@@ -768,6 +792,67 @@ export default function FBLiveEditor() {
              )}
          </div>
       </div>
+
+      {/* --- MODAL: THƯ VIỆN ẢNH --- */}
+      {showGallery && (
+        <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg w-full max-w-2xl flex flex-col max-h-[80vh] shadow-2xl animate-in fade-in zoom-in duration-200">
+                <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+                    <h3 className="font-bold text-lg flex items-center gap-2">
+                        <Grid size={20} className="text-[#1890ff]"/> Thư viện Avatar
+                    </h3>
+                    <button onClick={() => setShowGallery(false)} className="p-1 hover:bg-gray-100 rounded-full transition">
+                        <X size={20} className="text-gray-500"/>
+                    </button>
+                </div>
+                
+                <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+                    {gallery.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-48 text-gray-400">
+                            <ImageIcon size={48} className="mb-2 opacity-50"/>
+                            <p className="text-sm">Chưa có ảnh nào.</p>
+                            <p className="text-xs">Tải ảnh lên để bắt đầu.</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-5 gap-3">
+                            {gallery.map(img => {
+                                // Kiểm tra xem ảnh này đã được dùng ở đâu chưa
+                                const isUsed = scriptedComments.some(c => c.avatar === img.url) || newCmdAvatar === img.url;
+                                return (
+                                    <div 
+                                        key={img.id} 
+                                        onClick={() => selectImageFromGallery(img.url)}
+                                        className={`relative aspect-square rounded-md overflow-hidden cursor-pointer border-2 group transition-all
+                                            ${isUsed ? 'border-gray-300 opacity-60' : 'border-transparent hover:border-[#1890ff] shadow-sm'}
+                                        `}
+                                    >
+                                        <img src={img.url} className={`w-full h-full object-cover transition-transform duration-500 ${isUsed ? 'grayscale-[0.5]' : 'group-hover:scale-110'}`} alt="" />
+                                        
+                                        {/* Icon đánh dấu đã dùng */}
+                                        {isUsed && (
+                                            <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                                                <div className="bg-green-500 text-white p-1 rounded-full shadow-sm">
+                                                    <Check size={12} strokeWidth={4} />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+
+                <div className="p-4 border-t border-gray-100 bg-white rounded-b-lg">
+                    <label className="flex items-center justify-center gap-2 bg-[#1890ff] hover:bg-[#40a9ff] text-white py-2.5 rounded-lg cursor-pointer font-medium transition shadow-md w-full">
+                        <Upload size={18} /> Tải ảnh lên hàng loạt
+                        <input type="file" multiple accept="image/*" className="hidden" onChange={handleBulkImageUpload} />
+                    </label>
+                </div>
+            </div>
+        </div>
+      )}
+
     </div>
   );
 }
